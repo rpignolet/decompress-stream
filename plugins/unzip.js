@@ -13,12 +13,15 @@ function _getStat(entry) {
   const IFLNK = 40960;
   const madeBy = entry.versionMadeBy >> 8;
   let stat = new fs.Stats();
+  // convert external file attr int into a fs stat mode int
   stat.mode = (entry.externalFileAttributes >> 16) & 0xFFFF;
   let statMode = new StatMode(stat);
 
   if ((stat.mode & IFMT) === IFLNK) {
     statMode.isSymbolicLink(true);
   }
+  // check for windows weird way of specifying a directory
+  // https://github.com/maxogden/extract-zip/issues/13#issuecomment-154494566
   else if ((stat.mode & IFMT) === IFDIR || (madeBy === 0 && entry.externalFileAttributes === 16)) {
     statMode.isDirectory(true);
   }
